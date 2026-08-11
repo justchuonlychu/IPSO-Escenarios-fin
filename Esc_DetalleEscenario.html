@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detalle de Escenario Presupuestal</title>
+  <style>
+    :root { --ink:#142c36; --navy:#0e3b45; --blue:#1469e8; --line:#dce4ea; --canvas:#edf2f7; --muted:#61707f; --good:#107a48; --good-bg:#e9f8ef; --amber:#9a6200; --amber-bg:#fff4d6; --red:#ae271d; --red-bg:#fff0ef; --gray-bg:#f4f6f8; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--canvas); color:var(--ink); font-family:Arial, Helvetica, sans-serif; font-size:15px; }
+    .topbar { height:74px; background:#fff; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; padding:0 32px; }
+    .brand { color:var(--navy); font-size:22px; font-weight:700; letter-spacing:.4px; }.brand i { display:inline-block; width:26px; height:18px; border:3px solid var(--blue); border-radius:12px; vertical-align:-2px; margin-right:7px; }
+    .topbar a { color:var(--blue); text-decoration:none; font-weight:700; }
+    main { max-width:1380px; margin:32px auto; padding:0 24px 48px; }
+    .hero { color:#fff; background:var(--navy); border-bottom:5px solid #19aab8; border-radius:8px; padding:26px 30px; display:flex; align-items:center; justify-content:space-between; gap:20px; }
+    .hero h1 { margin:0 0 7px; font-size:28px; letter-spacing:0; }.crumb { color:#dce9ec; font-size:14px; }.crumb a { color:#fff; text-decoration:none; }.status { padding:7px 10px; border-radius:999px; background:#f0f5ff; color:#155ac0; font-size:13px; font-weight:700; white-space:nowrap; }
+    .layout { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:20px; margin-top:24px; }.layout > section,.side { min-width:0; }.card { background:#fff; border:1px solid var(--line); border-radius:8px; margin-bottom:18px; overflow:hidden; }.card-h { padding:17px 20px; border-bottom:1px solid var(--line); font-size:17px; font-weight:700; }.card-b { padding:20px; }.two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }.field { border:1px solid var(--line); border-radius:6px; padding:12px; min-height:74px; }.field span { display:block; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.35px; margin-bottom:6px; }.field b { font-size:15px; line-height:1.35; }.timeline { display:grid; grid-template-columns:repeat(6,1fr); gap:4px; }.step { color:#7b8791; font-size:11px; line-height:1.25; padding-top:34px; position:relative; }.step:before { content:''; position:absolute; top:11px; left:0; right:0; height:3px; background:#d9e0e6; }.step:first-child:before { left:50%; }.step:last-child:before { right:50%; }.step:after { content:''; position:absolute; top:4px; left:calc(50% - 9px); width:15px; height:15px; background:#fff; border:3px solid #c8d1d9; border-radius:50%; }.step.done:before,.step.current:before { background:#178653; }.step.done:after { border-color:#178653; background:#178653; }.step.current:after { border-color:#178653; }.step.current { color:#142c36; font-weight:700; }.notice { border-left:4px solid var(--blue); padding:13px 15px; background:#f4f8ff; line-height:1.45; }.notice.good { border-color:var(--good); background:var(--good-bg); }.notice.warn { border-color:var(--amber); background:var(--amber-bg); }.notice.danger { border-color:var(--red); background:var(--red-bg); }.mini-table { width:100%; border-collapse:collapse; margin-top:14px; }.mini-table th { text-align:left; background:#f7f9fb; color:#50606c; text-transform:uppercase; letter-spacing:.3px; font-size:11px; padding:10px; }.mini-table td { padding:11px 10px; border-top:1px solid var(--line); vertical-align:top; }.side .card-b { padding:0 18px; }.summary-row { padding:14px 0; border-bottom:1px solid var(--line); }.summary-row:last-child { border-bottom:0; }.summary-row span { display:block; color:var(--muted); text-transform:uppercase; letter-spacing:.35px; font-size:11px; margin-bottom:5px; }.summary-row b { line-height:1.35; }.actions { display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; padding-top:15px; }.button { min-height:36px; border-radius:5px; padding:8px 13px; font-weight:700; text-decoration:none; border:1px solid var(--blue); color:var(--blue); background:#fff; cursor:pointer; }.button.primary { background:#15864f; border-color:#15864f; color:#fff; }.button.warn { background:#eaae12; border-color:#eaae12; color:#17202a; }.tag { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; font-weight:700; }.tag.good { color:var(--good); background:var(--good-bg); }.tag.warn { color:var(--amber); background:var(--amber-bg); }.tag.danger { color:var(--red); background:var(--red-bg); }.tag.neutral { color:#465662; background:var(--gray-bg); }
+    .tree-card-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }.tree-tools { display:flex; gap:7px; }.tree-tool { min-height:30px; padding:5px 9px; border:1px solid var(--line); border-radius:5px; color:#2e5361; background:#fff; font-size:12px; font-weight:700; cursor:pointer; }.tree-wrap { overflow:auto; }.tree { width:100%; min-width:1010px; border-collapse:collapse; font-size:13px; }.tree th { padding:11px 12px; background:#f7f9fb; text-align:left; color:#50606c; font-size:11px; letter-spacing:.3px; text-transform:uppercase; white-space:nowrap; }.tree td { border-top:1px solid var(--line); padding:10px 12px; vertical-align:middle; }.tree .amount { text-align:right; white-space:nowrap; font-weight:700; }.tree-row.branch { cursor:pointer; background:#fafcfd; }.tree-row.branch:hover { background:#f2f7fb; }.tree-row.level-0 td { background:#e9eef2; font-weight:700; }.tree-row.level-1 td { background:#f4f7f9; font-weight:700; }.tree-row.level-2 td:first-child { font-weight:700; }.tree-label { display:flex; align-items:center; gap:7px; min-width:330px; }.tree-indent { display:inline-block; width:calc(var(--level) * 18px); flex:0 0 auto; }.tree-toggle { width:19px; height:19px; line-height:15px; padding:0; border:1px solid #aab8c2; border-radius:4px; color:#32515e; background:#fff; font-size:14px; font-weight:700; }.tree-toggle.empty { visibility:hidden; }.tree-meta { color:var(--muted); font-size:12px; }.tree-campaign { font-weight:700; }.tree-diff.good { color:var(--good); }.tree-diff.warn { color:var(--amber); }.tree-diff.danger { color:var(--red); }.tree-status { display:block; color:var(--muted); font-size:11px; margin-top:3px; }.tree-empty { text-align:center; color:var(--muted); padding:28px; }
+    @media (max-width:900px) { .layout { grid-template-columns:1fr; }.side { grid-row:1; }.timeline { overflow-x:auto; min-width:620px; }.timeline-wrap { overflow-x:auto; }.topbar { padding:0 18px; }.topbar a { font-size:13px; } main { padding:0 14px 34px; margin:20px auto; }.hero { padding:23px 21px; align-items:flex-start; flex-direction:column; }.hero h1 { font-size:24px; }.two { grid-template-columns:1fr; } }
+  </style>
+  <link rel="stylesheet" href="ipso-brand-theme.css">
+</head>
+<body>
+  <header class="topbar"><div class="brand"><i></i>IPSO</div><a href="Escenarios_Casos.html">Ver todos los casos</a></header>
+  <main>
+    <section class="hero"><div><h1 id="title">Detalle del escenario</h1><div class="crumb"><a href="P2_EscenariosPresupuestales.html">Ajustes Presupuestales</a> &nbsp;/&nbsp; <a href="Escenarios_Casos.html">Casos</a> &nbsp;/&nbsp; <span id="crumb">Detalle</span></div></div><span class="status" id="badge"></span></section>
+    <div class="layout"><section>
+      <article class="card"><div class="card-h">Ciclo del escenario</div><div class="card-b"><div class="timeline-wrap"><div class="timeline" id="timeline"></div></div></div></article>
+      <article class="card"><div class="card-h" id="typeHeading">Configuración del ajuste</div><div class="card-b"><div class="two" id="configuration"></div></div></article>
+      <article class="card"><div class="card-h tree-card-head"><div><div>Distribución por jerarquía</div><div class="tree-meta" id="treeCaption">Base origen, ajuste y resultado por Llave de Publicidad.</div></div><div class="tree-tools"><button class="tree-tool" id="expandTree" type="button">Expandir todo</button><button class="tree-tool" id="collapseTree" type="button">Contraer todo</button></div></div><div class="tree-wrap"><table class="tree"><thead id="treeHead"></thead><tbody id="treeBody"></tbody></table></div></article>
+      <article class="card"><div class="card-h" id="stateHeading">Control del escenario</div><div class="card-b" id="stateContent"></div></article>
+    </section><aside class="side">
+      <article class="card"><div class="card-h">Resumen de la corrida</div><div class="card-b" id="summary"></div></article>
+      <article class="card"><div class="card-h">Bitácora reciente</div><div class="card-b" id="log"></div></article>
+    </aside></div>
+  </main>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      var typeKey = q.get('tipo') || 'temporalidad';
+      var stateKey = q.get('estatus') || 'borrador';
+      var types = {
+        temporalidad: { name:'Cambio de temporalidad', id:'ESC-2027-004', scope:'Grupo Elektra / Crédito', base:'V4 sincronizada con SIPRES', execution:'Usuarios de carga', approval:'Flujo de aprobación', fields:[['Mes de solicitud','Agosto 2026'],['Configuración','Por meses'],['Periodos abiertos','Septiembre a diciembre'],['Distribución objetivo','Sep 20% · Oct 30% · Nov 25% · Dic 25%']] },
+        reduccion: { name:'Ajuste de reducción', id:'ESC-2027-003', scope:'Toda la carga con límite', base:'V4 sincronizada con SIPRES', execution:'Usuarios de carga', approval:'Flujo de aprobación', fields:[['Reducción solicitada','5% sobre la Base Presupuestal'],['Cuentas bloqueadas','Televisión'],['Base ajustable','42,600,000 MXN'],['Importe esperado','2,130,000 MXN']] },
+        historico: { name:'Ajuste combinado', id:'ESC-2027-005', scope:'Totalplay / Estrategia', base:'V4 sincronizada con SIPRES', execution:'Administración', approval:'Aprobación directa', fields:[['Orden del ajuste','Primero reducción; después temporalidad'],['Reducción configurada','5% sobre cuentas habilitadas'],['Temporalidad','Redistribución al segundo semestre'],['Llaves identificadas','124 Llaves de Publicidad']] },
+        retorno: { name:'Retorno a versión sincronizada', id:'ESC-2027-006', scope:'División Marca', base:'V4 sincronizada con SIPRES', execution:'Administración', approval:'Aprobación directa', fields:[['Versión a recuperar','V3 sincronizada con SIPRES'],['Fecha de sincronización','18/08/2026 18:30'],['Motivo','Restituir distribución autorizada'],['Validación','Sin alteraciones posteriores en el alcance']] }
+      };
+      var states = {
+        borrador: { name:'Borrador', tone:'neutral', step:0, heading:'Configuración pendiente de aplicación', body:function () { return '<div class="notice">La configuración aún no genera corrida ni afecta la Base Presupuestal. Administración puede editar el alcance, motivo, bloqueos y ventanas.</div><div class="actions"><a class="button" href="Escenarios_Casos.html">Descartar</a><button class="button primary">Guardar y aplicar</button></div>'; } },
+        ejecucion: { name:'En ejecución', tone:'good', step:1, heading:'Ventana de ajuste abierta', body:function () { return '<div class="notice good">La ventana está activa del 12/11/2026 10:00 al 14/11/2026 20:00. Las solicitudes del alcance ya muestran el ajuste requerido.</div><table class="mini-table"><thead><tr><th>Usuarios de carga</th><th>Solicitudes</th><th>Avance</th></tr></thead><tbody><tr><td>Grupo Elektra</td><td>18 de 25 ajustadas</td><td><span class="tag warn">72%</span></td></tr><tr><td>Totalplay</td><td>12 de 12 ajustadas</td><td><span class="tag good">100%</span></td></tr></tbody></table><div class="actions"><button class="button">Notificar pendientes</button><button class="button primary">Consultar solicitudes</button></div>'; } },
+        conciliacion: { name:'Pendiente de validación administrativa', tone:'warn', step:2, heading:'Validación administrativa requerida', body:function () { return '<div class="notice warn">La ventana cerró. Administración debe revisar el cumplimiento, las excepciones y las bolsas antes de cerrar el escenario.</div><table class="mini-table"><thead><tr><th>Resultado</th><th>Importe</th><th>Situación</th></tr></thead><tbody><tr><td>Configurado por el escenario</td><td>2,130,000 MXN</td><td>Confirmado</td></tr><tr><td>Aplicado por usuarios</td><td>1,970,000 MXN</td><td>Revisión pendiente</td></tr></tbody></table><div class="actions"><button class="button">Revisar solicitudes</button><button class="button primary">Validar cierre</button></div>'; } },
+        remanente: { name:'Remanente por resolver', tone:'warn', step:3, heading:'Bolsa de remanentes por reasignar', body:function () { return '<div class="notice warn">El importe no utilizado deja de mostrarse a los usuarios de carga y pasa a la bolsa administrativa del negocio para su reasignación.</div><table class="mini-table"><thead><tr><th>Origen</th><th>Remanente</th><th>Destino</th></tr></thead><tbody><tr><td>Grupo Elektra / Crédito</td><td>160,000 MXN</td><td>Bolsa institucional del negocio (por definir)</td></tr><tr><td>Totalplay / Estrategia</td><td>90,000 MXN</td><td>Bolsa institucional del negocio (por definir)</td></tr></tbody></table><div class="actions"><button class="button">Ver detalle por llave</button><button class="button primary">Registrar reasignación</button></div>'; } },
+        excedente: { name:'Excedente por validar', tone:'danger', step:3, heading:'Bolsa de excedentes por validar', body:function () { return '<div class="notice danger">El escenario conserva un importe que no pudo ajustarse por campañas marcadas como No aplica, cuentas bloqueadas o meses cerrados. Administración debe documentar su tratamiento.</div><table class="mini-table"><thead><tr><th>Solicitud</th><th>Motivo de excepción</th><th>Importe</th></tr></thead><tbody><tr><td>GPN-26041</td><td>Campaña Día de las Madres marcada como No aplica</td><td>180,000 MXN</td></tr><tr><td>GPN-26077</td><td>Televisión bloqueada; no existe cuenta alternativa</td><td>300,000 MXN</td></tr></tbody></table><div class="actions"><button class="button">Solicitar aclaración</button><button class="button warn">Registrar tratamiento</button></div>'; } },
+        cerrado: { name:'Cerrado', tone:'good', step:5, heading:'Escenario validado y aprobado', body:function () { return '<div class="notice good">Administración validó el cuadre, resolvió remanentes y excedentes, autorizó el cierre y generó la versión resultante. La versión está disponible para Liberaciones y su siguiente sincronización con SIPRES.</div><table class="mini-table"><thead><tr><th>Versión resultante</th><th>Responsable de cierre</th><th>Fecha</th></tr></thead><tbody><tr><td>V5</td><td>Administración de Presupuesto</td><td>15/11/2026 09:25</td></tr></tbody></table><div class="actions"><a class="button" href="Liberaciones.html">Ir a Liberaciones</a><button class="button primary">Consultar bitácora</button></div>'; } }
+      };
+      var type = types[typeKey] || types.temporalidad;
+      var state = states[stateKey] || states.borrador;
+      var sequence = ['Borrador','En ejecución','Validación administrativa','Bolsas por resolver','Validación final','Cerrado'];
+      document.title = type.name + ' · ' + state.name;
+      document.getElementById('title').textContent = type.name;
+      document.getElementById('crumb').textContent = state.name;
+      var badge = document.getElementById('badge'); badge.textContent = state.name; badge.className = 'status ' + state.tone;
+      document.getElementById('timeline').innerHTML = sequence.map(function (item, index) { var stateClass = index < state.step ? 'done' : index === state.step ? 'current' : ''; return '<div class="step ' + stateClass + '">' + item + '</div>'; }).join('');
+      document.getElementById('typeHeading').textContent = 'Configuración: ' + type.name;
+      document.getElementById('configuration').innerHTML = type.fields.map(function (item) { return '<div class="field"><span>' + item[0] + '</span><b>' + item[1] + '</b></div>'; }).join('');
+      var measures = {
+        temporalidad: { base:'Base origen V4', expected:'Redistribucion objetivo', applied:'Distribucion aplicada', difference:'Pendiente por distribuir', caption:'Compara la distribucion origen contra los meses o trimestres configurados para cada Llave de Publicidad.' },
+        reduccion: { base:'Base origen V4', expected:'Reduccion esperada', applied:'Reduccion aplicada', difference:'Diferencia', caption:'Muestra el ajuste por Llave de Publicidad, incluidas las cuentas bloqueadas y sus excepciones.' },
+        historico: { base:'Base origen V4', expected:'Reducción y temporalidad', applied:'Ajuste aplicado', difference:'Diferencia', caption:'Muestra el efecto combinado de reducción y temporalidad sobre cada Llave de Publicidad.' },
+        retorno: { base:'Version actual V4', expected:'Version V3', applied:'Resultado', difference:'Diferencia', caption:'Permite contrastar la version vigente contra la version sincronizada seleccionada para el retorno.' }
+      };
+      var treeRows = [
+        { id:'elektra', level:0, label:'Grupo Elektra', meta:'Grupo empresarial', base:'138,928,000', expected:'2,130,000', applied:'1,650,000', diff:'480,000', branch:true },
+        { id:'masivo', parent:'elektra', level:1, label:'Sector Mercado Masivo', meta:'Linea de negocio', base:'98,428,000', expected:'1,510,000', applied:'1,180,000', diff:'330,000', branch:true },
+        { id:'prestamos', parent:'masivo', level:2, label:'Prestamos y Cobranza', meta:'Unidad de negocio', base:'62,748,000', expected:'980,000', applied:'800,000', diff:'180,000', branch:true },
+        { id:'ceco100901', parent:'prestamos', level:3, label:'100901 - Dir Gral Conectividad', meta:'Centro de Costos', base:'12,500,000', expected:'180,000', applied:'0', diff:'180,000', branch:true },
+        { id:'c1', parent:'ceco100901', level:4, label:'C2026-001', meta:'Conectividad TV Q2', campaign:'C2026-001 - Conectividad TV Q2', account:'609011 - Television', base:'12,500,000', expected:'180,000', applied:'0', diff:'180,000', leafState:'No aplica: cuenta bloqueada' },
+        { id:'ceco291374', parent:'masivo', level:3, label:'291374 - Direccion Mercadotecnia Digital', meta:'Centro de Costos', base:'7,500,000', expected:'350,000', applied:'300,000', diff:'50,000', branch:true },
+        { id:'c2', parent:'ceco291374', level:4, label:'C2026-004', meta:'Estrategia Digital Redes Q2', campaign:'C2026-004 - Estrategia Digital Redes Q2', account:'609045 - Digital y Redes Sociales', base:'6,800,000', expected:'350,000', applied:'300,000', diff:'50,000' },
+        { id:'totalplay', level:0, label:'Totalplay', meta:'Grupo empresarial', base:'23,500,000', expected:'620,000', applied:'590,000', diff:'30,000', branch:true },
+        { id:'honduras', parent:'totalplay', level:1, label:'Honduras', meta:'Pais', base:'7,600,000', expected:'220,000', applied:'220,000', diff:'0', branch:true },
+        { id:'ceco920182', parent:'honduras', level:2, label:'920182 - Dir Mkt Honduras', meta:'Centro de Costos', base:'3,600,000', expected:'220,000', applied:'220,000', diff:'0', branch:true },
+        { id:'c3', parent:'ceco920182', level:3, label:'C2026-018', meta:'Sorteos Honduras', campaign:'C2026-018 - Sorteos Honduras', account:'609023 - Promociones y Sorteos', base:'2,600,000', expected:'220,000', applied:'220,000', diff:'0' }
+      ];
+      var treeState = {};
+      function metric(row, key) {
+        if (stateKey === 'borrador') { if (key === 'applied') return 'Sin aplicar'; if (key === 'diff') return row.expected; }
+        if (stateKey === 'cerrado') { if (key === 'applied') return row.expected; if (key === 'diff') return '0'; }
+        if (typeKey === 'temporalidad' && key === 'expected') return row.level > 3 ? 'Sep 20% / Oct 30% / Nov 25% / Dic 25%' : row.expected;
+        if (typeKey === 'historico' && key === 'expected') return row.level > 3 ? 'Patron historico validado' : row.expected;
+        if (typeKey === 'retorno' && key === 'expected') return row.level > 3 ? 'Recuperar V3' : row.expected;
+        return row[key];
+      }
+      function isVisible(row) {
+        var parent = row.parent;
+        while (parent) {
+          if (treeState[parent]) return false;
+          var parentRow = treeRows.filter(function (item) { return item.id === parent; })[0];
+          parent = parentRow && parentRow.parent;
+        }
+        return true;
+      }
+      function diffClass(row) {
+        var value = metric(row, 'diff');
+        if (value === '0') return 'good';
+        if (stateKey === 'excedente' && row.leafState) return 'danger';
+        return 'warn';
+      }
+      function renderTree() {
+        var measure = measures[typeKey] || measures.temporalidad;
+        document.getElementById('treeCaption').textContent = measure.caption;
+        document.getElementById('treeHead').innerHTML = '<tr><th>Jerarquia</th><th>Campana</th><th>Cuenta presupuestal</th><th class="amount">' + measure.base + '</th><th class="amount">' + measure.expected + '</th><th class="amount">' + measure.applied + '</th><th class="amount">' + measure.difference + '</th></tr>';
+        document.getElementById('treeBody').innerHTML = treeRows.filter(isVisible).map(function (row) {
+          var hasChildren = treeRows.some(function (item) { return item.parent === row.id; });
+          var marker = hasChildren ? (treeState[row.id] ? '+' : '-') : '';
+          var treeClass = hasChildren ? ' branch' : '';
+          var campaign = row.campaign ? '<span class="tree-campaign">' + row.campaign + '</span>' : '<span class="tree-meta">' + row.meta + '</span>';
+          var account = row.account || '<span class="tree-meta">-</span>';
+          var status = row.leafState && stateKey === 'excedente' ? '<span class="tree-status">' + row.leafState + '</span>' : '';
+          var expected = metric(row, 'expected');
+          var applied = metric(row, 'applied');
+          var difference = metric(row, 'diff');
+          var expectedSuffix = row.level > 3 && (typeKey === 'temporalidad' || typeKey === 'historico' || typeKey === 'retorno') ? '' : ' MXN';
+          return '<tr class="tree-row level-' + row.level + treeClass + '" data-tree-id="' + row.id + '"><td><div class="tree-label"><span class="tree-indent" style="--level:' + row.level + '"></span><button class="tree-toggle' + (hasChildren ? '' : ' empty') + '" type="button" tabindex="-1">' + marker + '</button><span>' + row.label + status + '</span></div></td><td>' + campaign + '</td><td>' + account + '</td><td class="amount">' + row.base + ' MXN</td><td class="amount">' + expected + expectedSuffix + '</td><td class="amount">' + applied + (applied === 'Sin aplicar' ? '' : ' MXN') + '</td><td class="amount tree-diff ' + diffClass(row) + '">' + difference + (difference === '0' ? '' : ' MXN') + '</td></tr>';
+        }).join('');
+        document.querySelectorAll('.tree-row.branch').forEach(function (row) { row.addEventListener('click', function () { var id = row.dataset.treeId; treeState[id] = !treeState[id]; renderTree(); }); });
+      }
+      document.getElementById('expandTree').addEventListener('click', function () { treeState = {}; renderTree(); });
+      document.getElementById('collapseTree').addEventListener('click', function () { treeRows.forEach(function (row) { if (row.branch) treeState[row.id] = true; }); renderTree(); });
+      renderTree();
+      document.getElementById('stateHeading').textContent = state.heading;
+      document.getElementById('stateContent').innerHTML = state.body();
+      document.getElementById('summary').innerHTML = [ ['ID del escenario', type.id], ['Alcance', type.scope], ['Base de origen', type.base], ['Responsable de ejecución', type.execution], ['Estrategia posterior', type.approval], ['Ventana de ajuste', stateKey === 'borrador' ? 'Sin activar' : '12/11/2026 10:00 a 14/11/2026 20:00'] ].map(function (item) { return '<div class="summary-row"><span>' + item[0] + '</span><b>' + item[1] + '</b></div>'; }).join('');
+      document.getElementById('log').innerHTML = '<div class="summary-row"><span>15/11/2026 09:25</span><b>Se actualizó el estatus a ' + state.name + '.</b></div><div class="summary-row"><span>12/11/2026 10:00</span><b>Se generó la corrida ligada a ' + type.base + '.</b></div><div class="summary-row"><span>11/11/2026 16:40</span><b>Administración registró el motivo y la configuración.</b></div>';
+    })();
+  </script>
+</body>
+</html>

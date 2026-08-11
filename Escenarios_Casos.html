@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Casos de Escenarios Presupuestales</title>
+  <style>
+    :root { --ink:#102a35; --navy:#0f3c45; --blue:#1269e8; --line:#dce4ea; --canvas:#edf2f7; --muted:#627180; --green:#198754; --amber:#a86d00; --red:#b42318; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--canvas); color:var(--ink); font-family:Arial, Helvetica, sans-serif; font-size:15px; }
+    .topbar { height:74px; background:#fff; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; padding:0 32px; }
+    .brand { font-weight:700; font-size:22px; letter-spacing:.4px; color:var(--navy); }
+    .brand i { display:inline-block; width:26px; height:18px; border:3px solid var(--blue); border-radius:12px; vertical-align:-2px; margin-right:7px; }
+    .back { color:var(--blue); text-decoration:none; font-weight:700; }
+    main { max-width:1380px; margin:32px auto; padding:0 24px 48px; }
+    .hero { background:var(--navy); color:#fff; padding:28px 32px; border-radius:8px; border-bottom:5px solid #18a9bb; }
+    .hero h1 { margin:0 0 8px; font-size:30px; letter-spacing:0; }
+    .hero p { margin:0; color:#e2ebef; }
+    .summary { margin:24px 0; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .metric { background:#fff; border:1px solid var(--line); border-radius:8px; padding:18px; min-height:105px; }
+    .metric span { display:block; color:var(--muted); font-size:13px; margin-bottom:9px; }
+    .metric strong { font-size:24px; color:var(--blue); }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+    .panel-header { padding:20px 22px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .panel-header h2 { font-size:18px; margin:0; }
+    .panel-header p { color:var(--muted); margin:4px 0 0; font-size:14px; }
+    .matrix { width:100%; border-collapse:collapse; min-width:980px; }
+    .matrix th { background:#f7f9fb; text-align:left; padding:14px 16px; color:#4b5a67; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
+    .matrix td { padding:15px 16px; border-top:1px solid var(--line); vertical-align:middle; }
+    .matrix td:first-child { min-width:220px; font-weight:700; }
+    .matrix small { display:block; color:var(--muted); font-weight:400; margin-top:4px; line-height:1.35; }
+    .table-wrap { overflow-x:auto; }
+    .case-link { display:inline-flex; min-height:32px; align-items:center; justify-content:center; padding:6px 10px; color:#1557ba; background:#f6f9ff; border:1px solid #cbdcf9; border-radius:5px; text-decoration:none; font-size:13px; font-weight:700; white-space:nowrap; }
+    .case-link:hover { background:#e9f1ff; }
+    .legend { display:flex; flex-wrap:wrap; gap:8px; color:var(--muted); font-size:13px; }
+    .legend b { color:var(--ink); }
+    @media (max-width:720px) { .topbar { padding:0 18px; }.summary { grid-template-columns:1fr; }.hero { padding:23px 22px; }.hero h1 { font-size:25px; } main { margin:20px auto; padding:0 14px 32px; } .panel-header { align-items:flex-start; flex-direction:column; } }
+  </style>
+  <link rel="stylesheet" href="ipso-brand-theme.css">
+</head>
+<body>
+  <header class="topbar"><div class="brand"><i></i>IPSO</div><a class="back" href="P2_EscenariosPresupuestales.html">Regresar a Ajustes Presupuestales</a></header>
+  <main>
+    <section class="hero">
+      <h1>Casos de Escenarios Presupuestales</h1>
+      <p>Consulta cómo cambia el detalle del ajuste desde el borrador hasta su validación administrativa y cierre.</p>
+    </section>
+    <section class="summary" aria-label="Resumen de casos">
+      <div class="metric"><span>Tipos de ajuste</span><strong>4</strong></div>
+      <div class="metric"><span>Estatus del escenario</span><strong>6</strong></div>
+      <div class="metric"><span>Vistas disponibles</span><strong>24</strong></div>
+    </section>
+    <section class="panel">
+      <div class="panel-header">
+        <div><h2>Matriz de vistas</h2><p>El detalle cambia según el ajuste configurado y el punto del flujo en que se encuentre.</p></div>
+        <div class="legend"><b>Control administrativo:</b> validación, bolsas de remanentes y excedentes, excepciones y cierre.</div>
+      </div>
+      <div class="table-wrap"><table class="matrix"><thead><tr><th>Tipo de ajuste</th><th>Borrador</th><th>En ejecución</th><th>Pendiente de validación</th><th>Remanente por resolver</th><th>Excedente por validar</th><th>Cerrado</th></tr></thead><tbody id="matrix"></tbody></table></div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var types = [
+        ['temporalidad', 'Cambio de temporalidad', 'Redistribuye importes entre meses o trimestres.'],
+        ['reduccion', 'Ajuste de reducción', 'Reduce el límite sobre cuentas permitidas.'],
+        ['historico', 'Ajuste combinado', 'Combina temporalidad y reducción sobre el mismo alcance.'],
+        ['retorno', 'Retorno a versión sincronizada', 'Recupera una versión anterior de SIPRES.']
+      ];
+      var states = [
+        ['borrador', 'Borrador'], ['ejecucion', 'En ejecución'], ['conciliacion', 'Pendiente de validación'],
+        ['remanente', 'Remanente por resolver'], ['excedente', 'Excedente por validar'], ['cerrado', 'Cerrado']
+      ];
+      document.getElementById('matrix').innerHTML = types.map(function (type) {
+        return '<tr><td>' + type[1] + '<small>' + type[2] + '</small></td>' + states.map(function (state) {
+          return '<td><a class="case-link" href="Esc_DetalleEscenario.html?tipo=' + type[0] + '&estatus=' + state[0] + '">' + state[1] + '</a></td>';
+        }).join('') + '</tr>';
+      }).join('');
+    })();
+  </script>
+</body>
+</html>
