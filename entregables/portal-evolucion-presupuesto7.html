@@ -213,26 +213,28 @@ function makeXlsx(header,rows,boldLast){
 let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600)}
 const go=r=>{location.hash=r};
 const sw=(on,attr)=>`<button class="sw ${on?'on':''}" role="switch" aria-checked="${!!on}" ${attr}></button>`;
-const NAV=[['config','Panel de configuración'],['traslados','Traslados'],['arrastres','Arrastres'],['liquidas','Líquidas','Pronto'],['estado','Estado de cuenta','Pronto'],['autorizaciones','Autorizaciones']];
-const PARENT={'traslados-detalle':'traslados','arrastres-detalle':'arrastres','traslados-confirmacion':'traslados','arrastres-confirmacion':'arrastres','autorizaciones-historico':'autorizaciones'};
-const TITLES={config:'Panel de configuración',traslados:'Traslados','traslados-detalle':'Traslados · Detalle','traslados-confirmacion':'Traslados · Confirmación',arrastres:'Arrastres','arrastres-detalle':'Arrastres · Detalle','arrastres-confirmacion':'Arrastres · Confirmación',liquidas:'Líquidas',estado:'Estado de cuenta',autorizaciones:'Autorizaciones','autorizaciones-historico':'Histórico de autorizaciones','traslados-solicitudes':'Traslados · Solicitudes'};
+const NAV=[['config','Panel de configuración'],['traslados','Traslados'],['arrastres','Arrastres'],['liquidas','Líquidas'],['estado','Estado de cuenta','Pronto'],['autorizaciones','Autorizaciones']];
+const PARENT={'traslados-detalle':'traslados','arrastres-detalle':'arrastres','traslados-confirmacion':'traslados','arrastres-confirmacion':'arrastres','autorizaciones-historico':'autorizaciones','liquidas-consulta':'liquidas','liquidas-bitacora':'liquidas'};
+const TITLES={config:'Panel de configuración',traslados:'Traslados','traslados-detalle':'Traslados · Detalle','traslados-confirmacion':'Traslados · Confirmación',arrastres:'Arrastres','arrastres-detalle':'Arrastres · Detalle','arrastres-confirmacion':'Arrastres · Confirmación',liquidas:'Líquidas',estado:'Estado de cuenta',autorizaciones:'Autorizaciones','autorizaciones-historico':'Histórico de autorizaciones','traslados-solicitudes':'Traslados · Solicitudes','liquidas-consulta':'Líquidas · Consulta','liquidas-bitacora':'Líquidas · Bitácora'};
 function renderNav(r){const act=PARENT[r]||r;
- $('#nav').innerHTML=`<div class="grp ${S.nav.evo?'':'closed'}"><button data-evo>Evolución de presupuesto <span>▾</span></button><div class="items">${NAV.map(([k,n,t])=>`<a data-go="${k}" class="${k===act?'on':''}">${n}${t?`<em class="tag" style="font-style:normal">${t}</em>`:''}${k==='autorizaciones'?`<span class="cnt">${AUT.k.p}</span>`:''}</a>${k==='traslados'?`<a data-go="traslados-solicitudes" class="sub ${act==='traslados-solicitudes'?'on':''}">Solicitudes</a>`:''}`).join('')}</div></div>`}
+ $('#nav').innerHTML=`<div class="grp ${S.nav.evo?'':'closed'}"><button data-evo>Evolución de presupuesto <span>▾</span></button><div class="items">${NAV.map(([k,n,t])=>`<a data-go="${k}" class="${k===act?'on':''}">${n}${t?`<em class="tag" style="font-style:normal">${t}</em>`:''}${k==='autorizaciones'?`<span class="cnt">${AUT.k.p}</span>`:''}</a>${k==='traslados'?`<a data-go="traslados-solicitudes" class="sub ${act==='traslados-solicitudes'?'on':''}">Solicitudes</a>`:''}${k==='liquidas'?`<a data-go="liquidas-consulta" class="sub ${r==='liquidas-consulta'||r==='liquidas'?'on':''}">Consulta</a><a data-go="liquidas-bitacora" class="sub ${r==='liquidas-bitacora'?'on':''}">Bitácora</a>`:''}`).join('')}</div></div>`}
 const crumb=r=>`<div class="crumb"><b>Inicio</b><span>/</span><b>Evolución de presupuesto</b><span>/</span><b>${TITLES[r]}</b></div>`;
 
 /* ============ pantallas ============ */
 
-/* ============ Panel de configuración · pestañas integradas (Líquidas / Usuarios y perfiles) ============ */
-const EMB={'liq-consulta':{g:'Líquidas',t:'Consulta',id:'emb-liq-consulta'},'liq-bitacora':{g:'Líquidas',t:'Bitácora',id:'emb-liq-bitacora'},'liq-panel':{g:'Líquidas',t:'Panel de control',id:'emb-liq-panel'},'usuarios':{g:'Usuarios y perfiles',t:'Roles y permisos',id:'emb-usuarios'}};
-const EMB_URL={};
-function embUrl(k){if(EMB_URL[k])return EMB_URL[k];const el=document.getElementById(EMB[k].id);const bin=atob(el.textContent.trim());const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);EMB_URL[k]=new TextDecoder('utf-8').decode(u8);return EMB_URL[k]}
-function cfgExtraTabs(){const on=k=>CFG.tab===k?'on':'';return `<button data-tab="liq-consulta" class="${on('liq-consulta')}">Líquidas · Consulta</button><button data-tab="liq-bitacora" class="${on('liq-bitacora')}">Líquidas · Bitácora</button><button data-tab="liq-panel" class="${on('liq-panel')}">Líquidas · Panel de control</button><button data-tab="usuarios" class="${on('usuarios')}">Usuarios y perfiles</button>`}
-function vEmb(){const e=EMB[CFG.tab];setTimeout(()=>{const f=document.querySelector('iframe[data-emb]');if(f&&!f.srcdoc)f.srcdoc=embUrl(f.dataset.emb)},0);
+/* ============ Líquidas (Consulta / Bitácora) y Panel de configuración (Líquidas / Usuarios y perfiles) ============ */
+const EMB={'liq-consulta':'emb-liq-consulta','liq-bitacora':'emb-liq-bitacora','liq-panel':'emb-liq-panel','usuarios':'emb-usuarios'};
+const EMB_TXT={};
+function embTxt(k){if(EMB_TXT[k])return EMB_TXT[k];const bin=atob(document.getElementById(EMB[k]).textContent.trim());const u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return EMB_TXT[k]=new TextDecoder('utf-8').decode(u8)}
+function embFrame(k,t){const go=()=>{const f=document.querySelector('iframe[data-emb]');if(f&&!f.srcdoc)f.srcdoc=embTxt(f.dataset.emb)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go,{once:true});else setTimeout(go,0);return `<iframe title="${t}" data-emb="${k}" style="display:block;width:100%;height:calc(100vh - 230px);min-height:620px;border:0;background:#fff"></iframe>`}
+function vEmbR(r,k){return `${crumb(r)}<div class="hrow"><h1>${TITLES[r]}</h1></div><div class="tbl">${embFrame(k,TITLES[r])}</div>`}
+function cfgExtraTabs(){const on=k=>CFG.tab===k?'on':'';return `<button data-tab="liq-panel" class="${on('liq-panel')}">Líquidas</button><button data-tab="usuarios" class="${on('usuarios')}">Usuarios y perfiles</button>`}
+function vCfgEmb(){const t=CFG.tab==='usuarios'?'Usuarios y perfiles · Roles y permisos':'Líquidas · Panel de control';
  return `${crumb('config')}<div class="hrow"><h1>Panel de configuración</h1></div>
  <div class="tabs"><button data-tab="traslados">Traslados</button><button data-tab="arrastres">Arrastres</button>${cfgExtraTabs()}</div>
- <div class="tbl"><div class="hd"><b>${e.g} · ${e.t}</b><span class="n">Apartado integrado</span></div><iframe title="${e.g} · ${e.t}" data-emb="${CFG.tab}" style="display:block;width:100%;height:calc(100vh - 230px);min-height:620px;border:0;background:#fff"></iframe></div>`}
+ <div class="tbl"><div class="hd"><b>${t}</b></div>${embFrame(CFG.tab,t)}</div>`}
 function vConfig(){
- if(EMB[CFG.tab])return vEmb();
+ if(CFG.tab==='liq-panel'||CFG.tab==='usuarios')return vCfgEmb();
  const rules=CFG.rules[CFG.tab],opts=v=>DIM.map(x=>`<option ${x===v?'selected':''}>${x}</option>`).join('');
  return `${crumb('config')}<div class="hrow"><h1>Panel de configuración</h1></div>
  <div class="tabs"><button data-tab="traslados" class="${CFG.tab==='traslados'?'on':''}">Traslados</button><button data-tab="arrastres" class="${CFG.tab==='arrastres'?'on':''}">Arrastres</button>${cfgExtraTabs()}</div>
@@ -482,7 +484,7 @@ function render(){
  let r=location.hash.replace('#','')||'config';if(!TITLES[r])r='config';
  renderNav(r);
  if(!render.keep){document.querySelectorAll('.mask').forEach(m=>m.remove());if(typeof closePanel==='function')closePanel()}
- const V={config:vConfig,traslados:()=>vBalances('traslados'),arrastres:()=>vBalances('arrastres'),'traslados-detalle':()=>vDetalle('traslados'),'arrastres-detalle':()=>vDetalle('arrastres'),'traslados-confirmacion':()=>vConfirmacion('traslados'),'arrastres-confirmacion':()=>vConfirmacion('arrastres'),autorizaciones:vAut,'autorizaciones-historico':vHist,'traslados-solicitudes':vSolicitudes,liquidas:()=>vSoon('liquidas'),estado:()=>vSoon('estado')};
+ const V={config:vConfig,traslados:()=>vBalances('traslados'),arrastres:()=>vBalances('arrastres'),'traslados-detalle':()=>vDetalle('traslados'),'arrastres-detalle':()=>vDetalle('arrastres'),'traslados-confirmacion':()=>vConfirmacion('traslados'),'arrastres-confirmacion':()=>vConfirmacion('arrastres'),autorizaciones:vAut,'autorizaciones-historico':vHist,'traslados-solicitudes':vSolicitudes,liquidas:()=>vEmbR('liquidas','liq-consulta'),'liquidas-consulta':()=>vEmbR('liquidas-consulta','liq-consulta'),'liquidas-bitacora':()=>vEmbR('liquidas-bitacora','liq-bitacora'),estado:()=>vSoon('estado')};
  $('#view').innerHTML=V[r]();document.title=TITLES[r]+' · Evolución de presupuesto';
  $('main').scrollTop=0}
 
