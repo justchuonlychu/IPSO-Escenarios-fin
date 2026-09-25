@@ -131,6 +131,15 @@ th .fico.on{color:var(--acc);font-weight:700}
 .pager button{height:27px;padding:0 10px;border:1px solid var(--line);background:#fff;border-radius:4px;cursor:pointer;font-size:12px}
 .pager button:disabled{opacity:.4;cursor:not-allowed}
 @media (max-width:900px){aside{width:200px}.g3,.g5,.cascade .gs,.split,.kpis{grid-template-columns:1fr 1fr}}
+</style>
+<style id="cfg-params">
+.arr-tg{display:flex;align-items:center;justify-content:space-between;gap:14px;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;background:var(--panel)}
+.arr-tl{font-size:12.5px;font-weight:600}.arr-tv{display:flex;align-items:center;gap:8px;font:600 11px var(--mono);color:var(--mut)}
+.arr-ck{display:flex;gap:18px;flex-wrap:wrap}.arr-ck label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer}
+.arr-chips{display:flex;flex-wrap:wrap;gap:5px;min-width:220px}
+.arr-chip{display:inline-flex;align-items:center;gap:4px;font:12px var(--mono);border:1px solid var(--line);background:var(--panel);border-radius:99px;padding:1px 4px 1px 9px}
+.arr-chip button{border:0;background:transparent;cursor:pointer;color:var(--mut);font-size:10px;padding:0 4px;border-radius:50%}.arr-chip button:hover{color:#b3261e;background:var(--er-bg)}
+.ctl:disabled{background:var(--panel);color:var(--mut);cursor:not-allowed}
 </style></head><body>
 <div id="app">
  <div class="top"><span class="brand"><i></i>Portal</span><span class="sp"></span><span class="user">Usuario <u>AR</u></span></div>
@@ -232,7 +241,118 @@ function cfgExtraTabs(){const on=k=>CFG.tab===k?'on':'';return `<button data-tab
 function vCfgEmb(){const t=CFG.tab==='usuarios'?'Usuarios y perfiles · Roles y permisos':'Líquidas · Panel de control';
  return `${crumb('config')}<div class="hrow"><h1>Panel de configuración</h1></div>
  <div class="tabs"><button data-tab="traslados">Traslados</button><button data-tab="arrastres">Arrastres</button>${cfgExtraTabs()}</div>
+ ${CFG.tab==='liq-panel'?vLiqParams():''}
  <div class="tbl"><div class="hd"><b>${t}</b></div>${embFrame(CFG.tab,t)}</div>`}
+
+/* ============ Panel de configuración · parámetros de Arrastres y Líquidas ============ */
+const ARR_PERF=[['GM','Gerente de Marca'],['AYF','Coordinador / Consultor AyF'],['ADM','Administrador de Presupuesto']];
+const ARR_CECO={'291374':'DIRECCION MERCADOTECNIA DIGITAL','239729':'PUBLICIDAD COBRANZA','238043':'PUBLICIDAD GUARDADITO','240003':'','240090':'División Oferteo','616528':'','616786':'','617001':'','617005':'','618200':'','618201':'','618203':'','618206':'','618210':''};
+const ARR_USR=[['C8971851','ADALBERTO GOMEZ DE PUGILE POCEROS'],['11577904','NERI CERVANTES ORTIZO'],['1200153','NOEVE ROBLES SANCHEZ'],['828384','NOHEMI CORDOBA'],['C8974410','MARIANA SOTO VELÁZQUEZ'],['11580217','RICARDO NAVA FUENTES']];
+const ARR={
+ p:{ini:{d:'2026-12-01',h:'09:00'},cie:{d:'2027-01-15',h:'18:00'},man:1,umb:500000,vig:90,cand:1,perf:{GM:1,AYF:1,ADM:1},
+  map:{C8971851:['291374','239729','240003'],'11577904':['617005','618203','618206'],'1200153':['616528','618201','618210','240090'],'828384':['616528','616786','617001','617005'],C8974410:['291374','239729'],'11580217':['240003','240090']}},
+ mot:'',
+ bit:[{u:'ANA ROSA MENDOZA ACOSTA',f:'22/09/2026 10:15',k:'Vigencia del Folio de Reserva Digital',a:'60 días',n:'90 días',m:'Homologar la vigencia de la reserva con el cierre de ODT pendientes del ejercicio 2026.'}]
+};
+ARR.saved=JSON.parse(JSON.stringify(ARR.p));
+const LIQ={p:{freq:'batch',hora:'02:00',evid:1}};LIQ.saved=JSON.parse(JSON.stringify(LIQ.p));
+const LIQ_FREQ=[['batch','Diario (Batch Nocturno T-1)'],['odata','Tiempo Real (OData On-Demand)'],['12h','Cada 12 Horas']];
+const HH=/^([01]\d|2[0-3]):[0-5]\d$/;
+const dmy=d=>{if(!d)return'';const [y,m,x]=d.split('-');return `${x}/${m}/${y}`};
+const arrDT=o=>o.d&&HH.test(o.h)?new Date(o.d+'T'+o.h):null;
+const mxn=n=>'$'+fmt(n)+' MXN';
+function arrErrs(){const p=ARR.p,e={},a=arrDT(p.ini),b=arrDT(p.cie);
+ if(!a)e.ini='Captura fecha y hora (HH:MM, 24 h).';
+ if(!b)e.cie='Captura fecha y hora (HH:MM, 24 h).';else if(a&&b<=a)e.cie='El cierre debe ser posterior al inicio.';
+ if(p.man&&!(p.umb>0))e.umb='Captura un importe mayor a 0.';
+ if(!(Number.isInteger(p.vig)&&p.vig>0))e.vig='Captura un número entero de días mayor a 0.';
+ if(!ARR_PERF.some(([k])=>p.perf[k]))e.perf='Selecciona al menos un perfil.';
+ return e}
+function arrOk(){return !Object.keys(arrErrs()).length&&ARR.mot.trim().length>0}
+function arrGuard(){const b=document.querySelector('[data-guardar]');if(b&&CFG.tab==='arrastres')b.disabled=!arrOk();
+ const h=document.getElementById('arrMotH');if(h){const ok=ARR.mot.trim().length>0;h.className='hint '+(ok?'good':'bad');h.innerHTML=ok?'<span><b>Motivo capturado.</b></span>':'<span><b>Obligatorio:</b> sin motivo el botón Guardar permanece bloqueado.</span>'}}
+function arrSnap(p){return{
+ 'Fecha y Hora de Inicio de Arrastre':dmy(p.ini.d)+' '+p.ini.h,
+ 'Fecha y Hora de Cierre de Arrastre':dmy(p.cie.d)+' '+p.cie.h,
+ '¿Requiere Autorización Manual para Arrastres Anuales?':p.man?'ON':'OFF',
+ 'Umbral de Aprobación Automática':mxn(p.umb),
+ 'Vigencia del Folio de Reserva Digital':p.vig+' días',
+ 'Candado de Mismo Proyecto/Fondo':p.cand?'ON':'OFF',
+ 'Perfiles Autorizados para Solicitar Arrastres':ARR_PERF.filter(([k])=>p.perf[k]).map(x=>x[1]).join(', ')||'Ninguno',
+ ...Object.fromEntries(ARR_USR.map(([id,n])=>['Mapeo de CeCos · '+id+' '+n,(p.map[id]||[]).join(', ')||'Sin CeCos']))}}
+function arrCommit(){const a=arrSnap(ARR.saved),b=arrSnap(ARR.p),d=new Date(),f=today()+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+ const ch=Object.keys(b).filter(k=>a[k]!==b[k]);
+ if(!ch.length)ARR.bit.unshift({u:'Usuario AR',f,k:'Sin cambios en parámetros',a:'—',n:'—',m:ARR.mot.trim()});
+ ch.forEach(k=>ARR.bit.unshift({u:'Usuario AR',f,k,a:a[k],n:b[k],m:ARR.mot.trim()}));
+ ARR.saved=JSON.parse(JSON.stringify(ARR.p));ARR.mot='';render()}
+function vArrParams(){const p=ARR.p,e=arrErrs(),er=k=>e[k]?`<div class="hint bad"><b>${e[k]}</b></div>`:'';
+ const dt=(k,l)=>`<div class="pf"><label>${l} <i>*</i></label><div style="display:grid;grid-template-columns:1fr 110px;gap:8px">
+  <input type="date" class="ctl" value="${p[k].d}" data-arrf="${k}.d"><input class="ctl" value="${esc(p[k].h)}" placeholder="HH:MM" maxlength="5" inputmode="numeric" data-arrf="${k}.h" title="Formato 24 horas"></div>${er(k)}</div>`;
+ const tg=(k,l,d)=>`<div class="arr-tg"><div><div class="arr-tl">${l}</div><div class="hint" style="margin:2px 0 0">${d}</div></div><div class="arr-tv">${sw(p[k],`data-arrsw="${k}"`)}<b>${p[k]?'ON':'OFF'}</b></div></div>`;
+ const opts=id=>Object.keys(ARR_CECO).filter(c=>!(p.map[id]||[]).includes(c)).map(c=>`<option value="${c}">${c}${ARR_CECO[c]?' - '+ARR_CECO[c]:''}</option>`).join('');
+ return `
+ <div class="fs"><b>1. Calendario y Ventana de Cierre Fiscal</b><div class="in g3">
+  ${dt('ini','Fecha y Hora de Inicio de Arrastre')}
+  ${dt('cie','Fecha y Hora de Cierre de Arrastre')}
+  <div class="pf"><label>Fecha Marca de Mes Real (Corte Fiscal)</label><input class="ctl ro" readonly value="31/12/2026"><div class="hint">Fijo. Congela el gasto ejercido del ejercicio 2026 reconocido en SAP BCS.</div></div>
+ </div></div>
+ <div class="fs"><b>2. Motor de Reglas de Autorización y Gobernanza</b><div class="in g2">
+  ${tg('man','¿Requiere Autorización Manual para Arrastres Anuales?','Con ON, los arrastres que superan el umbral se envían a la Bandeja de Autorizaciones del Administrador.')}
+  <div class="pf"><label>Umbral de Aprobación Automática ($ MXN)${p.man?' <i>*</i>':''}</label><input class="ctl" style="text-align:right;font-family:var(--mono)" value="${p.umb?fmt(p.umb):''}" data-arrf="umb" ${p.man?'':'disabled'}>
+   ${er('umb')}<div class="hint">Montos iguales o menores a ${mxn(p.umb||0)} se aprueban automáticamente; montos mayores se envían a la Bandeja de Autorizaciones.</div></div>
+  <div class="pf"><label>Vigencia del Folio de Reserva Digital (días naturales) <i>*</i></label><input class="ctl" type="number" min="1" step="1" value="${Number.isFinite(p.vig)?p.vig:''}" data-arrf="vig">
+   ${er('vig')}<div class="hint">Plazo para vincular la factura u ODT pendiente en el nuevo ejercicio antes de que la reserva expire.</div></div>
+  ${tg('cand','Candado de Mismo Proyecto/Fondo','Con ON, el Proyecto/Fondo de origen y destino deben ser iguales; se bloquean transferencias a proyectos distintos.')}
+ </div></div>
+ <div class="fs"><b>3. Matriz de Perfilamiento y Permisos</b><div class="in">
+  <div class="pf"><label>Perfiles Autorizados para Solicitar Arrastres <i>*</i></label><div class="arr-ck">
+   ${ARR_PERF.map(([k,n])=>`<label><input type="checkbox" data-arrperf="${k}" ${p.perf[k]?'checked':''}> ${n}</label>`).join('')}</div>${er('perf')}</div>
+  <div class="pf"><label>Mapeo de CeCos por Usuario</label>
+   <div class="tbl"><div class="sc" style="max-height:340px"><table><thead><tr><th>No. empleado</th><th>Nombre</th><th>CeCos autorizados</th><th>Agregar CeCo</th></tr></thead><tbody>
+   ${ARR_USR.map(([id,n])=>`<tr><td class="num" style="text-align:left">${id}</td><td>${n}</td>
+    <td style="white-space:normal"><div class="arr-chips">${(p.map[id]||[]).map(c=>`<span class="arr-chip" title="${ARR_CECO[c]||''}">${c}<button data-arrcecodel="${id}:${c}" title="Quitar CeCo">✕</button></span>`).join('')||'<span style="color:var(--mut)">Sin CeCos</span>'}</div></td>
+    <td><div style="display:flex;gap:6px"><select class="ctl" style="width:230px;height:30px" id="arrsel-${id}">${opts(id)}</select><button class="ib" data-arrcecoadd="${id}" title="Agregar CeCo">＋</button></div></td></tr>`).join('')}
+   </tbody></table></div></div></div>
+ </div></div>
+ <div class="fs"><b>4. Control de Auditoría</b><div class="in">
+  <div class="pf"><label>Motivo / Justificación del Ajuste de Parámetros <i>*</i></label><textarea class="ctl" style="height:auto;min-height:74px;padding:8px 10px;resize:vertical" data-arrf="mot" placeholder="Describe el motivo del cambio">${esc(ARR.mot)}</textarea><div id="arrMotH" class="hint ${ARR.mot.trim()?'good':'bad'}">${ARR.mot.trim()?'<span><b>Motivo capturado.</b></span>':'<span><b>Obligatorio:</b> sin motivo el botón Guardar permanece bloqueado.</span>'}</div></div>
+  <div class="pf"><label>Bitácora de Cambios (Historial Auditado)</label>
+   <div class="tbl"><div class="sc" style="max-height:300px"><table><thead><tr><th>Usuario</th><th>Fecha/Hora</th><th>Parámetro</th><th>Parámetro anterior</th><th>Parámetro nuevo</th><th>Motivo del cambio</th></tr></thead><tbody>
+   ${ARR.bit.map(x=>`<tr><td>${esc(x.u)}</td><td class="num" style="text-align:left">${x.f}</td><td>${esc(x.k)}</td><td>${esc(x.a)}</td><td>${esc(x.n)}</td><td style="white-space:normal;min-width:260px">${esc(x.m)}</td></tr>`).join('')}
+   </tbody></table></div></div></div>
+ </div></div>`}
+function liqRender(){const c=document.getElementById('liqParams');if(c)c.innerHTML=vLiqInner()}
+function vLiqParams(){
+ return `<div id="liqParams" style="display:flex;flex-direction:column;gap:16px">${vLiqInner()}</div>`}
+function vLiqInner(){const p=LIQ.p,rt=p.freq==='odata',bad=!rt&&!HH.test(p.hora);
+ return `<div class="fs"><b>1. Parámetros de Sincronización y Mapeo con SAP BCS</b><div class="in g2">
+  <div class="pf"><label>Frecuencia de Sincronización</label><select class="ctl" data-liqf="freq">${LIQ_FREQ.map(([k,n])=>`<option value="${k}" ${p.freq===k?'selected':''}>${n}${k==='batch'?' · Predeterminado':''}</option>`).join('')}</select></div>
+  <div class="pf"><label>Horario Batch${rt?'':' <i>*</i>'}</label><input class="ctl" value="${esc(p.hora)}" placeholder="HH:MM" maxlength="5" data-liqf="hora" ${rt?'disabled':''}>
+   ${bad?'<div class="hint bad"><b>Captura la hora en formato HH:MM (24 h).</b></div>':`<div class="hint">${rt?'No aplica con sincronización en tiempo real.':'Formato 24 horas.'}</div>`}</div>
+ </div></div>
+ <div class="fs"><b>2. ¿Exigir Documento Soporte / Evidencia Directiva?</b><div class="in">
+  <div class="arr-tg"><div><div class="arr-tl">Exigir Documento Soporte / Evidencia Directiva</div><div class="hint" style="margin:2px 0 0">Con ON, es obligatorio adjuntar un archivo PDF o MSG al vincular la líquida a una campaña.</div></div><div class="arr-tv">${sw(p.evid,'data-liqsw="evid"')}<b>${p.evid?'ON':'OFF'}</b></div></div>
+ </div></div>
+ <div class="acts end"><button class="btn" data-liqsave ${bad?'disabled':''}>Guardar parámetros de Líquidas</button></div>`}
+document.addEventListener('click',e=>{
+ const s=e.target.closest('[data-arrsw]');if(s){const k=s.dataset.arrsw;ARR.p[k]=ARR.p[k]?0:1;render();return}
+ const d=e.target.closest('[data-arrcecodel]');if(d){const [id,c]=d.dataset.arrcecodel.split(':');ARR.p.map[id]=(ARR.p.map[id]||[]).filter(x=>x!==c);render();return}
+ const a=e.target.closest('[data-arrcecoadd]');if(a){const id=a.dataset.arrcecoadd,v=document.getElementById('arrsel-'+id).value;if(!v)return;(ARR.p.map[id]=ARR.p.map[id]||[]).push(v);render();return}
+ const l=e.target.closest('[data-liqsw]');if(l){const k=l.dataset.liqsw;LIQ.p[k]=LIQ.p[k]?0:1;liqRender();return}
+ if(e.target.closest('[data-liqsave]')){LIQ.saved=JSON.parse(JSON.stringify(LIQ.p));toast('Parámetros de Líquidas guardados');return}
+});
+document.addEventListener('input',e=>{const f=e.target.closest('[data-arrf]');if(!f)return;const k=f.dataset.arrf;
+ if(k==='mot'){ARR.mot=f.value;arrGuard();return}
+ if(k==='umb')ARR.p.umb=Number(f.value.replace(/[^0-9.]/g,''))||0;
+ else if(k==='vig')ARR.p.vig=f.value===''?NaN:Number(f.value);
+ else{const [o,q]=k.split('.');ARR.p[o][q]=f.value}
+ arrGuard()});
+document.addEventListener('change',e=>{
+ const f=e.target.closest('[data-arrf]');if(f&&f.dataset.arrf!=='mot'){render();return}
+ const c=e.target.closest('[data-arrperf]');if(c){ARR.p.perf[c.dataset.arrperf]=c.checked?1:0;render();return}
+ const q=e.target.closest('[data-liqf]');if(q){LIQ.p[q.dataset.liqf]=q.value.trim();liqRender();return}
+});
+
 function vConfig(){
  if(CFG.tab==='liq-panel'||CFG.tab==='usuarios')return vCfgEmb();
  const rules=CFG.rules[CFG.tab],opts=v=>DIM.map(x=>`<option ${x===v?'selected':''}>${x}</option>`).join('');
@@ -246,7 +366,8 @@ function vConfig(){
  <div class="tbl"><div class="hd"><b>Candado por cuenta presupuestal</b><span class="n">${CFG.locks.length} renglón(es)</span></div><div class="sc"><table><thead><tr><th>#</th><th>Cuenta</th><th class="ctr">Permite recibir</th><th class="ctr">Permite retirar</th><th>Última actualización</th><th>Responsable</th></tr></thead><tbody>
  ${CFG.locks.map((x,i)=>`<tr><td class="num">${i+1}</td><td>${x.c}</td><td class="ctr">${sw(x.rec,`data-lock="${i}:rec"`)}</td><td class="ctr">${sw(x.ret,`data-lock="${i}:ret"`)}</td><td>${x.f}</td><td>${x.r}</td></tr>`).join('')}
  </tbody></table></div></div>
- <div class="acts end"><button class="btn" data-guardar>Guardar</button></div>`}
+ ${CFG.tab==='arrastres'?vArrParams():''}
+ <div class="acts end"><button class="btn" data-guardar ${CFG.tab==='arrastres'&&!arrOk()?'disabled':''}>Guardar</button></div>`}
 
 function getFiltered(t){
  let rows=RAWDATA.map((r,i)=>({r,i}));
@@ -515,7 +636,7 @@ function openConfigConfirm(){
  const close=()=>{m.remove();document.removeEventListener('keydown',esk)};const esk=e=>{if(e.key==='Escape')close()};document.addEventListener('keydown',esk);
  m.addEventListener('click',e=>{
   if(e.target===m||e.target.closest('[data-close]')){close();return}
-  if(e.target.closest('[data-confirmsave]')){close();toast('Configuración guardada');return}
+  if(e.target.closest('[data-confirmsave]')){close();if(CFG.tab==='arrastres')arrCommit();toast('Configuración guardada');return}
  });
 }
 
